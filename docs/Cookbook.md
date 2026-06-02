@@ -10,7 +10,9 @@ Every resume should begin with:
 
 ```text
 Brief context summary
+Loaded skill: path=<loaded SKILL.md path or unknown>; source/version=<marker or unknown>
 Task status breakdown
+User deferrals
 Clear next action
 ```
 
@@ -197,8 +199,52 @@ The main pattern is:
 Before switching agents, ask the current agent for a compact handoff instead of pasting a full transcript:
 
 ```text
-Create a compact handoff for the next coding agent. Include only the goal, completed work, in-progress work, not-done work, changed files, commands run, verification, exact stopping point, and next action. Redact secrets and customer data.
+Create a compact handoff for the next coding agent. Include only the goal, completed work, in-progress work, deferred or parked scope, not-done work, changed files, commands run, verification, exact stopping point, and next action. Redact secrets and customer data.
 ```
+
+### Prove Which Skill Ran
+
+When comparing behavior between Codex and Claude Code, first prove which installed skill each runtime loaded. Ask each agent to report:
+
+- loaded `SKILL.md` path, or `unknown` if the runtime does not expose it
+- source/version marker such as plugin manifest version, marketplace version, git commit, tag, package source, or checksum
+- candidate install paths checked, clearly labeled as candidates when they are not proven loaded
+
+Common standalone install paths to compare:
+
+```text
+${CODEX_HOME:-$HOME/.codex}/skills/agent-session-resume/SKILL.md
+$HOME/.claude/skills/agent-session-resume/SKILL.md
+```
+
+Claude Code plugin installs may report a plugin-managed loaded path or only the plugin manifest/version. If the path or version cannot be proven, the resume report should say `unknown` instead of inferring from a nearby checkout.
+
+After updating an installed skill, restart the app/CLI or reload the plugin before expecting active sessions to use the new instructions. A running Codex or Claude Code session may keep the previously loaded skill text.
+
+Useful checks when the files are accessible:
+
+```bash
+shasum -a 256 "${CODEX_HOME:-$HOME/.codex}/skills/agent-session-resume/SKILL.md"
+shasum -a 256 "$HOME/.claude/skills/agent-session-resume/SKILL.md"
+```
+
+If a repository checkout is being used as the package source, record its commit too:
+
+```bash
+git -C /path/to/agent-session-resume rev-parse HEAD
+```
+
+### Preserve Parked Scope
+
+Explicit user deferrals are part of the handoff. Words such as "skip", "park", "leave out", "not now", "later", "hold", or "out of scope" should be carried forward with evidence and an explicit reopen rule.
+
+If the next prompt is vague, such as:
+
+```text
+Proceed.
+```
+
+the agent should continue only the unparked next action. It should ask before reviving deferred scope unless the user clearly names that scope or the recorded reopen condition has been met.
 
 ### Claude Code Continuing Codex
 
@@ -275,6 +321,8 @@ When leaving one agent and moving to another, ask the first agent to create:
 
 ## In Progress
 
+## Deferred / Parked
+
 ## Not Done
 
 ## Files Changed
@@ -321,6 +369,10 @@ Finish checkout retry handling.
 ## In Progress
 
 - Webhook replay path still needs inspection.
+
+## Deferred / Parked
+
+- Loyalty discount handling was explicitly parked until the retry bug is fixed.
 
 ## Not Done
 

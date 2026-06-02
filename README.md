@@ -62,6 +62,8 @@ cp -R "$tmp_dir/agent-session-resume/skills/agent-session-resume" "${CODEX_HOME:
 
 Restart Codex after installing.
 
+If you update the installed skill files, restart Codex or start a new session before expecting the new instructions to be active.
+
 ### Claude Code
 
 Recommended plugin install:
@@ -112,6 +114,8 @@ Use the standalone install if you prefer the shorter `/agent-session-resume` com
 
 Choose one Claude Code install path. Installing both the plugin and standalone skill can show duplicate short command suggestions; the namespaced plugin command avoids ambiguity.
 
+If you update the installed skill files, restart Claude Code or run `/reload-plugins` before expecting active sessions to use the new instructions.
+
 ### Other Agents
 
 For agents that do not support skill folders directly, load `skills/agent-session-resume/SKILL.md` as the main instruction document and use the relevant platform file from `skills/agent-session-resume/references/`.
@@ -142,11 +146,26 @@ Expected first response shape:
 
 ```text
 Brief context summary
+Loaded skill: path=<loaded SKILL.md path or unknown>; source/version=<marker or unknown>
 Task status breakdown
+User deferrals
 Clear next action
 ```
 
 After that checkpoint, the agent should continue from the first unfinished step without redoing completed work.
+
+## Skill Source And Deferrals
+
+Resume reports should identify the loaded skill path and source/version marker when available, and should say `unknown` when the runtime does not expose them. Useful markers include the Claude plugin manifest version, marketplace package version, git commit, tag, package source, or a checksum of the loaded `SKILL.md`.
+
+When comparing Codex and Claude Code behavior, compare the known install paths before concluding that the same skill version ran:
+
+```text
+${CODEX_HOME:-$HOME/.codex}/skills/agent-session-resume/SKILL.md
+$HOME/.claude/skills/agent-session-resume/SKILL.md
+```
+
+Explicit user deferrals such as "skip", "park", "leave out", or "not now" should be preserved in resume context. A vague prompt such as "Proceed" should not unpark that scope without confirmation.
 
 ## Claude Code Notes
 
