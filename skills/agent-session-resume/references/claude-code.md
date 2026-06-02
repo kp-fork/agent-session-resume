@@ -136,10 +136,31 @@ For large transcript or tool-output files, use an evidence inventory before deep
 4. Search/slice the relevant evidence.
 5. Continue to the final transcript event so late corrections or appended turns are not missed.
 
-If the transcript may still be active or was modified during resume, recheck the tail before reporting:
+If the transcript may still be active or was modified during resume, recheck the tail before reporting. Use a bounded projected tail instead of dumping raw JSONL, so the final scan keeps visible messages, tool-use summaries, and tool-result previews while skipping opaque `thinking` or `signature` payloads:
 
 ```bash
-tail -n 20 "$session"
+tail -n 80 "$session" | jq -r '
+  def projected_content:
+    if (.message.content | type) == "string" then
+      {kind: "text", body: .message.content}
+    elif (.message.content | type) == "array" then
+      .message.content[]
+      | if .type == "text" then
+          {kind: "text", body: .text}
+        elif .type == "tool_use" then
+          {kind: "tool_use", body: ((.name // "tool") + " " + ((.input // {}) | tostring))}
+        elif .type == "tool_result" then
+          {kind: "tool_result", body: ((.content // "") | tostring | .[0:500])}
+        else empty
+        end
+    else empty
+    end;
+
+  select(.type == "user" or .type == "assistant" or .type == "system")
+  | . as $event
+  | projected_content
+  | "\($event.timestamp // "")\t\($event.type)\t\(.kind)\t\(.body)"
+'
 ```
 
 The exact stopping point should come from the final meaningful events, not from the first TODO list. Capture:

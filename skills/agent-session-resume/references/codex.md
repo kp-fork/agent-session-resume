@@ -109,12 +109,31 @@ Use event types to decide what to inspect next:
 | `response_item` with `function_call_output` | Tool output; inspect selectively when relevant |
 | token counts, web-search status, and other telemetry | Usually skip unless debugging the resume process itself |
 
-For large tool outputs, first identify the relevant event, command, file, or error text. Then slice by line range or search for matching terms instead of loading the whole output:
+For large tool outputs, first identify the relevant event, command, file, or error text. Then search a sidecar or narrowed output source, or slice the specific transcript line range, instead of loading the whole output:
 
 ```bash
-rg -n "error|failed|TODO|<file-or-symbol-pattern>" "$session_file"
+rg -n "error|failed|TODO|<file-or-symbol-pattern>" path/to/tool-output-or-sidecar.txt
 sed -n '120,220p' "$session_file"
 ```
+
+Do not use broad raw JSONL regex scans as the first evidence pass for Codex transcripts. Matches inside `session_meta`, embedded developer/system instructions, tool schemas, or serialized prompts can look like user-visible TODOs or errors even when they are only context. Project the event stream first, then apply targeted `rg` to that projected view or to a narrowed line range:
+
+```bash
+jq -r '
+  select(.type == "event_msg" or .type == "response_item")
+  | if .type == "event_msg" and (.payload.type == "user_message" or .payload.type == "agent_message") then
+      [.timestamp, .payload.type, (.payload.message // .payload.text // "")]
+    elif .type == "response_item" and .payload.type == "function_call" then
+      [.timestamp, "tool_call", ((.payload.name // "tool") + " " + ((.payload.arguments // "") | tostring))]
+    elif .type == "response_item" and .payload.type == "function_call_output" then
+      [.timestamp, "tool_output", ((.payload.output // .payload.content // "") | tostring | .[0:1000])]
+    else empty
+    end
+  | @tsv
+' "$session_file" | rg -n "error|failed|TODO|<file-or-symbol-pattern>"
+```
+
+Use raw `rg` only after the projection reveals a specific event, file path, command, or line range worth inspecting.
 
 ## Reading
 

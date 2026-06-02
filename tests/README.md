@@ -55,5 +55,5 @@ The validator checks matrix structure and coverage. It does not prove model beha
 - `opencode-session-export`: session export with leftover cleanup and leak check work
 - `codex-noisy-jsonl`: noisy Codex JSONL with telemetry, reasoning, tool calls, and bounded resume evidence
 - `codex-wrong-newest`: candidate-selection pressure case where a newer unrelated session must lose to the cwd match
-- `claude-noisy-jsonl`: Claude JSONL with duplicate titles, queue metadata, and a persisted-output sidecar
+- `claude-noisy-jsonl`: Claude JSONL with duplicate titles, queue metadata, opaque thinking/signature payloads, and a persisted-output sidecar
 - `large-transcript`: large-transcript pressure case that should be inventoried and searched before deep reading
