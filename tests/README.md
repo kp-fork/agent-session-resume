@@ -15,6 +15,8 @@ claude plugin validate .claude-plugin/marketplace.json
 
 The package validator checks the installable skill shape and the optional Claude plugin wrapper that points at the same canonical skill folder. The fixture validator checks that every supported platform has a scenario, that each source and expected-output file exists, that expected outputs include the required resume sections, task classifications, and fixture evidence references, and that optional source/expected cues are present. The trigger matrix validator checks prompt coverage for should-trigger and should-not-trigger cases.
 
+For benchmark areas and issue/PR evaluation fields, see [`docs/Benchmarking.md`](../docs/Benchmarking.md).
+
 Validate compact handoff files with:
 
 ```bash

@@ -122,6 +122,8 @@ Short prompts should be enough; the skill carries the platform-specific discover
 
 For more examples, see the [cookbook](docs/Cookbook.md).
 
+For benchmark areas, fixture expectations, and issue/PR evaluation fields, see [Benchmarking](docs/Benchmarking.md).
+
 Continue the most recent Codex session for the current repository:
 
 ```text
@@ -184,6 +186,8 @@ claude plugin validate .claude-plugin/marketplace.json
 ```
 
 The standalone skill under `skills/agent-session-resume` is the source of truth. The optional Claude plugin wrapper uses the repo root as its source, so it shares that canonical skill folder instead of maintaining a second copy. The fixtures in `tests/fixtures/` cover Claude Code, Codex, Antigravity, and OpenCode handoff shapes. Each scenario pairs sample session material with the expected context summary, task status breakdown, and next action. `tests/trigger-matrix.json` tracks prompt coverage for manual or automated trigger testing.
+
+Use [docs/Benchmarking.md](docs/Benchmarking.md) when proposing improvements so PRs explain what behavior changed, how it was measured, and what a good result looks like.
 
 ## License
 
