@@ -208,11 +208,14 @@
       "expected": "claude-noisy-jsonl/expected.md",
       "source_cues": [
         "\"type\":\"ai-title\"",
+        "\"type\":\"thinking\"",
+        "\"signature\":\"opaque-signature-placeholder\"",
         "<persisted-output>",
         "tool-results/checkout.txt"
       ],
       "expected_cues": [
         "duplicate title events",
+        "opaque thinking/signature payloads are noise",
         "persisted-output sidecar"
       ],
       "task_statuses": {
