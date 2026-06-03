@@ -364,6 +364,23 @@ python3 scripts/session-digest.py path/to/session.jsonl path/to/handoff.md
 
 The digest is an orientation aid, not a replacement for evidence review. After digesting, still inspect the relevant transcript slices, tool outputs, changed files, git state, and verification results before continuing work.
 
+## Benchmarking Improvements
+
+When proposing changes to the skill, adapters, fixtures, or helper scripts, describe the behavior being improved and the benchmark target. Use the standard areas in [Benchmarking](Benchmarking.md), especially session selection, discovery effort, token usage proxy, resume accuracy, evidence quality, safety/redaction, robustness, trigger behavior, and reviewer clarity.
+
+Recommended PR sections:
+
+```markdown
+## What this improves
+
+## Benchmark target
+
+| Benchmark area | What we measure | Good result |
+| --- | --- | --- |
+```
+
+Use deterministic fixture checks for repository consistency, then add agent-in-the-loop notes when a change affects realistic discovery or resume behavior.
+
 ## Good Handoff File Template
 
 When leaving one agent and moving to another, ask the first agent to create:
